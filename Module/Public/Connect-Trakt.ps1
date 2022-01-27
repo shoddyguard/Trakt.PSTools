@@ -129,6 +129,7 @@ function Connect-Trakt
     {
         if ($TraktSession)
         {
+            $Global:TraktSession = $TraktSession
             Return $TraktSession
         }
         else
