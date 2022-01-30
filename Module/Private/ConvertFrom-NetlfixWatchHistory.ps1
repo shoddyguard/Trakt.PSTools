@@ -24,6 +24,14 @@
         "SeasonNumber": "1",
         "EpisodeTitle": "Welcome to Republic City"
     }
+.EXAMPLE
+    PS C:\> ConvertFrom-NetflixWatchHistory -InputObject "Batman Begins"
+
+    This would return the following object:
+    {
+        "Type": "Movie",
+        "Title": "Batman Begins"
+    }
 #>
 function ConvertFrom-NetflixWatchHistory
 {
