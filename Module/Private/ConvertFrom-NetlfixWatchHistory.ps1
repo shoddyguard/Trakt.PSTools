@@ -94,7 +94,7 @@ function ConvertFrom-NetflixWatchHistory
                     }
                     Default
                     {
-                        throw "Unhandled book number: $BookNumber"
+                        Write-Error "Unhandled book number: $BookNumber"
                     }
                 }
             }
@@ -120,7 +120,6 @@ function ConvertFrom-NetflixWatchHistory
             if (!$Title -or !$SeasonNumber -or !$EpisodeTitle)
             {
                 Write-Error "Unable to parse show name, season number, or episode name from $InputObject"
-                Return $null
             }
             else
             {
