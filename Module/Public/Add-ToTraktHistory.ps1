@@ -105,7 +105,7 @@ function Add-ToTraktHistory
     
     end
     {
-        # Do we want to return "not_found" items?
+        # Do we want to return "not_found" items in a special way?
         if ($Response)
         {
             Return $Response
