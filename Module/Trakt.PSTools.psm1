@@ -12,6 +12,13 @@ $PublicCmdlets = @()
 $CompatibleCmdlets = @()
 $IncompatibleCmdlets = @()
 
+# Cache path
+$Global:TraktPSToolsCachePath = Join-Path -Path $Global:HOME -ChildPath '.traktpstools'
+if (!(Test-Path $Global:TraktPSToolsCachePath))
+{
+    New-Item -Path $Global:TraktPSToolsCachePath -ItemType Directory -Force -ErrorAction SilentlyContinue # Force is needed cos dotfile
+}
+
 
 # Dot source our private functions so they are available for our public functions to use
 Join-Path $PSScriptRoot -ChildPath 'Private' |
