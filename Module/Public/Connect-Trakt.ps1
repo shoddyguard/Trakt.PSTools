@@ -30,7 +30,7 @@ function Connect-Trakt
     
     begin
     {
-        $TraktSessionPath = Join-Path -Path $Global:HOME -ChildPath '.trakt'
+        $TraktSessionPath = Join-Path -Path $Global:TraktPSToolsCachePath -ChildPath '.session'
         try
         {
             $TraktSession = Get-Content -Path $TraktSessionPath -Raw | ConvertFrom-Json
