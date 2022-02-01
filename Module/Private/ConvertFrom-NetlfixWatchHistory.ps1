@@ -107,6 +107,15 @@ function ConvertFrom-NetflixWatchHistory
                 $SeasonNumber = $Matches.BookNumber
                 $EpisodeTitle = $Matches.EpisodeTitle
             }
+            # Hacks for Masters of the Universe Part 1/2
+            'Masters of the Universe: Revelation: Part [1|2]: (?<EpisodeTitle>.*)'
+            {
+                Write-Verbose 'Applying special case for Masters of the Universe'
+                $Type = 'TV Show'
+                $Title = 'Masters of the Universe: Revelation'
+                $SeasonNumber = 1
+                $EpisodeTitle = $Matches.EpisodeTitle
+            }
             default
             {
                 # Assume it's a movie
