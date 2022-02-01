@@ -134,17 +134,23 @@ function Get-TraktSeason
                 {
                     # Find it's index in of the array of shows.
                     $IndexOfShow = $CachedData.IndexOf($CachedShow)
-
-                    # We've already got the show in our cache, so just update/add the season.
-                    if ($CachedSeasonCheck)
+                    if ($IndexOfShow -lt 0)
                     {
-                        # We've already got the season so update it.
-                        $CachedData[$IndexOfShow].Seasons.$SeasonNumber = $Result
+                        Write-Error "Failed to find index of show $ShowID in cache."
                     }
                     else
                     {
-                        # We don't have the season in our cache so add it.
-                        $CachedData[$IndexOfShow].Seasons | Add-Member -MemberType NoteProperty -Name $SeasonNumber -Value $Result
+                        # We've already got the show in our cache, so just update/add the season.
+                        if ($CachedSeasonCheck)
+                        {
+                            # We've already got the season so update it.
+                            $CachedData[$IndexOfShow].Seasons.$SeasonNumber = $Result
+                        }
+                        else
+                        {
+                            # We don't have the season in our cache so add it.
+                            $CachedData[$IndexOfShow].Seasons | Add-Member -MemberType NoteProperty -Name $SeasonNumber -Value $Result
+                        }
                     }
                 }
                 else
