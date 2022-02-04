@@ -8,7 +8,7 @@ function Import-NetflixHistory
     param
     (
         # The path to the Netflix history CSV
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [string]
         $HistoryFile,
         
@@ -89,7 +89,7 @@ function Import-NetflixHistory
         $FilteredMovies = @()
         $FailedTVShows = @()
         # These will be used to filter out special characters from the title
-        $AcceptedCharacters = '[^a-zA-Z]'
+        $AcceptedCharacters = '[^a-zA-Z0-9]'
     }
     
     process
@@ -98,6 +98,8 @@ function Import-NetflixHistory
         # a TV show or a movie.
         foreach ($WatchedItem in $NetflixHistory)
         {
+            # Unfortunately Netflix doesn't store the watch time, only the date.
+            # This shouldn't be an issue as Trakt will accept clashing times.
             $WatchDate = (Get-Date $WatchedItem.Date)
 
             # Try to convert the watched item into an object we can work with.
@@ -108,9 +110,8 @@ function Import-NetflixHistory
             catch
             {
                 # Throw because we can't do anything with this item.
-                throw "Failed to convert $($WatchedItem.Title).`n$($_.Exception.Message).`nNo changes will be made to Trakt."
+                throw "Failed to convert '$($WatchedItem.Title)' into a Trakt item.`n$($_.Exception.Message).`nNo changes have been made to Trakt."
             }
-
 
             if ($ConvertedItem.Type -eq 'TV Show')
             {
@@ -130,15 +131,18 @@ function Import-NetflixHistory
             }
         }
 
+        # Debug helpers
+        if ($DebugPreference -ne 'SilentlyContinue')
+        {
+            $Global:DebugTVShowsToImport = $TVShowsToImport
+            $Global:DebugMoviesToImport = $MoviesToImport
+            Start-Sleep 100
+        }
+
         if ($TVShowsToImport)
         {
-            # Debug helpers
-            Write-Debug "TV Shows to import:`n$($TVShowsToImport)"
-            if ($DebugPreference -ne 'SilentlyContinue')
-            {
-                $Global:DebugTVShowsToImport = $TVShowsToImport
-            }
-
+            
+            Write-Debug "TV Shows to import:`n$($TVShowsToImport.Count)"
             # Filter the list of TV shows so we only process each show once.
             $TVShowTitles = $TVShowsToImport | Select-Object -ExpandProperty Title -Unique
             foreach ($Title in $TVShowTitles)
@@ -182,6 +186,10 @@ function Import-NetflixHistory
                             if (!$ShowID)
                             {
                                 Write-Error "Failed to get ShowID slug for $($TVShow.Title)"
+                            }
+                            if ($ShowID -gt 1)
+                            {
+                                Write-Error "More than one perfect match for $($TVShow.Title)"
                             }
                         }
                     }
@@ -242,7 +250,7 @@ function Import-NetflixHistory
                             }
                             else
                             {
-                                Write-Error "Failed to find episode ID for $($Episode.EpisodeTitle) in $($TVShow.Title) season $($Episode.SeasonNumber)"
+                                Write-Warning "Failed to find episode ID for $($Episode.EpisodeTitle) in $($TVShow.Title) season $($Episode.SeasonNumber).`nThis will not be tracked."
                             }
                         }
                     }
